@@ -31,9 +31,10 @@ import {
   savePanelsList,
   updatePanel,
 } from "../dataManager.ts";
-import type {
-  Panel,
-  Panels,
+import {
+  zPanelSidebarConfig,
+  type Panel,
+  type Panels,
 } from "../../../../../../apps/main/core/common/panel-sidebar/utils/type.ts";
 import { PanelEditModal } from "./PanelEditModal.tsx";
 import {
@@ -76,6 +77,32 @@ const SortablePanel = ({
     return panel.url || panel.extensionId || t("panelSidebar.untitled");
   }, [panel, t]);
 
+  const [displayURLName, setDisplayURLName] = useState<string | null>(null);
+
+  const fetchURTitle = async () => {
+    try {
+      const response = await fetch(panel.url as string);
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const title = doc.querySelector("title")?.textContent;
+      return title;
+    } catch (error) {
+      console.log("Failed to fetch URL title:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (panel.type === "web") {
+      fetchURTitle().then((title) => {
+        if (title) {
+          setDisplayURLName(title);
+        }
+      });
+    }
+  }, [])
+
+
   return (
     <div
       ref={setNodeRef}
@@ -97,7 +124,7 @@ const SortablePanel = ({
               <img src={panel.icon} alt="" className="w-5 h-5 rounded-full" />
             )}
             <span className="max-w-md truncate">
-              {displayName}
+              {displayURLName ? displayURLName : displayName}
             </span>
           </div>
           <div className="text-sm text-base-content/60 mt-1">
