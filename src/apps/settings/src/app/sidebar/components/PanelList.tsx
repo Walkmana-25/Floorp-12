@@ -103,6 +103,9 @@ const SortablePanel = ({
           <div className="text-sm text-base-content/60 mt-1">
             <div className="badge badge-sm">
               {t(`panelSidebar.type.${panel.type}`)}
+              {(panel.type === "web" && (
+                <span>{displayName}</span>
+              ))}
             </div>
             {panel.width > 0 && (
               <span className="ml-2 text-xs">{panel.width}px</span>
